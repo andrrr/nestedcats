@@ -22,6 +22,7 @@
 						`rgt` int(11) NOT NULL,
 						`level` int(3) NOT NULL default '0',
 						`title` varchar(255),
+						`handle` varchar(255),
 						PRIMARY KEY  (`id`),
 						KEY `lft` (`lft`,`rgt`,`level`)
 					) ENGINE=MyISAM  DEFAULT CHARSET=utf8
