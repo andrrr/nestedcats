@@ -1,0 +1,20 @@
+tr td {padding:4px 0 6px}
+.n1 {margin-left:15px}
+.n2 {margin-left:30px}
+.n3 {margin-left:45px}
+.n4 {margin-left:40px}
+.n5 {margin-left:55px}
+.n6 {margin-left:70px}
+.n7 {margin-left:85px}
+.n8 {margin-left:100px}
+.n9 {margin-left:115px}
+.n10 {margin-left:130px}
+
+.actions div {float:right}
+.actions #note {color:#333;padding:3px 0 0;color:#666;float:right}
+.actions .hidden {display:none}
+
+.nc-breadcrumbs {list-style:none;padding-top:15px;font-size:1.1em;overflow:hidden}
+.nc-breadcrumbs li {float:left;margin:0 10px 0 0}
+
+input.delete {float:left !important}

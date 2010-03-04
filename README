@@ -1,0 +1,22 @@
+Nested Cats Extension
+------------------------------------
+
+Version: 2.0 beta
+Author: Andrey Lubinov (andrey.lubinov@gmail.com)
+Build Date: 4th March 2010
+
+
+[INSTALLATION]
+
+1. Upload the 'nestedcats' folder in this archive to your Symphony 'extensions' folder.
+
+2. Enable it by selecting the "Nested Cats", choose Enable from the with-selected menu, then click Apply.
+
+
+[USAGE]
+- 1. Go to the Categories/Overview and add some categories.
+  2. Append "Nested Cats" field to your section.
+  3. Append "Nested Cats" Data Source to your page (optional).
+
+- See Data Source's about for example XML and possible XSL template.
+
