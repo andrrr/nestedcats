@@ -9,28 +9,27 @@
 		function example(){
 			return '	<nested-cats>
 		<main-tree>
-			<item id="7" parent-id="1" level="1">Fruits</item>
-			<item id="8" parent-id="7" level="2">Apples</item>
-			<item id="9" parent-id="7" level="2">Bananas</item>
-			<item id="10" parent-id="1" level="1">Animals</item>
-			<item id="11" parent-id="10" level="2">Giraffes</item>
-			<item id="12" parent-id="10" level="2">Pandas</item>
+			<item id="7" parent-id="1" level="0">Fruits</item>
+			<item id="8" parent-id="7" level="1">Apples</item>
+			<item id="9" parent-id="7" level="1">Bananas</item>
+			<item id="10" parent-id="1" level="0">Animals</item>
+			<item id="11" parent-id="10" level="1">Giraffes</item>
+			<item id="12" parent-id="10" level="1">Pandas</item>
 		</main-tree>
 		</nested-cats>
 
-	Possible Usage:
+	Example Usage:
 
 	<ul>
-		<xsl:apply-templates select="nested-cats/item[@level = 1]"/>
+		<xsl:apply-templates select="nested-cats/main-tree/item[@level = 0]"/>
 	</ul>
 
-	<xsl:template match="nested-cats/item">
-		<xsl:variable name="id" select="@id"/>
+	<xsl:template match="nested-cats/main-tree/item">
 		<li>
 			<a href="{$root}/test/{@handle}"><xsl:value-of select="."/></a>
-			<xsl:if test="/data/nested-cats/item[@parent-id = $id]">
+			<xsl:if test="/data/main-tree/nested-cats/item[@parent-id = current()/@id]">
 				<ul>
-					<xsl:apply-templates select="/data/nested-cats/item[@parent-id = $id]"/>
+					<xsl:apply-templates select="/data/main-tree/nested-cats/item[@parent-id = current()/@id]"/>
 				</ul>
 			</xsl:if>
 		</li>
