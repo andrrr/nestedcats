@@ -23,7 +23,6 @@
 		}
 
 		function allowDatasourceOutputGrouping(){
-			if($this->get('allow_multiple_selection') == 'yes') return false;
 			return true;
 		}
 
@@ -53,13 +52,25 @@
 			$groups = array($this->get('element_name') => array());
 
 			foreach($records as $r){
+
 				$data = $r->getData($this->get('id'));
-				$value = $data['relation_id'];
-				if(!isset($groups[$this->get('element_name')][$value])){
-					$groups[$this->get('element_name')][$value] = array('attr' => array('link-id' => $data['relation_id'], 'link-handle' => $data['handle']));
+
+				if(!is_array($data['relation_id'])){
+					$data['relation_id'] = array($data['relation_id']);
+					$data['value'] = array($data['value']);
+					$data['handle'] = array($data['handle']);
 				}
-				$groups[$this->get('element_name')][$value]['records'][] = $r;
-			}
+
+				$value = $data['relation_id'];
+
+				foreach($value as $k => $v){
+					if(!isset($groups[$this->get('element_name')][$v])){
+						$groups[$this->get('element_name')][$v] = array('attr' => array('link-id' => $data['relation_id'][$k], 'link-handle' => 	$data['handle'][$k]));
+					}
+					$groups[$this->get('element_name')][$v]['records'][] = $r;
+				}
+
+ 			}
 
 			return $groups;
 		}
