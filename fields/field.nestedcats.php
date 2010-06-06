@@ -8,7 +8,7 @@
 
 		function __construct(&$parent){
 			parent::__construct($parent);
-			$this->_name = 'Nested Cats';
+			$this->_name = __('Nested Categories');
 			$this->_required = true;
 
 			$this->_driver = $this->_engine->ExtensionManager->create('nestedcats');
@@ -17,24 +17,6 @@
 			$this->set('show_column', 'no');
 			$this->set('required', 'yes');
 		}
-
-/*
-		function canToggle(){
-			return ($this->get('allow_multiple_selection') == 'yes' ? false : true);
-		}
-
-		function getToggleStates(){
-			$options = $this->findOptions();
-			$output = $options[0]['values'];
-			$output[""] = "None";
-			return $output;
-		}
-
-		function toggleFieldData($data, $new_value){
-			$data['relation_id'] = $new_value;
-			return $data;
-		}
-*/
 
 		function canFilter(){
 			return true;
@@ -65,35 +47,41 @@
 			foreach($array as $field => $value) $this->set($field, $value);
 		}
 
-		function groupRecords($records){
-
+		public function groupRecords($records){
 			if(!is_array($records) || empty($records)) return;
 
 			$groups = array($this->get('element_name') => array());
 
 			foreach($records as $r){
-
 				$data = $r->getData($this->get('id'));
-
 				$value = $data['relation_id'];
-
 				if(!isset($groups[$this->get('element_name')][$value])){
 					$groups[$this->get('element_name')][$value] = array('attr' => array('link-id' => $data['relation_id'], 'link-handle' => $data['handle']));
 				}
-
 				$groups[$this->get('element_name')][$value]['records'][] = $r;
-
 			}
 
 			return $groups;
-
 		}
 
-		function prepareTableValue($data, XMLElement $link=NULL){
+		public function prepareTableValue($data, XMLElement $link=NULL){
 			if(!is_array($data) || (is_array($data) && !isset($data['relation_id']))) return parent::prepareTableValue(NULL);
-			$link = Widget::Anchor($data['value'], URL . '/symphony/extension/nestedcats/list/view/' . $data['relation_id']);
 
-			return $link;
+			if(!is_array($data['relation_id'])){
+				$data['relation_id'] = array($data['relation_id']);
+				$data['value'] = array($data['value']);
+				$data['handle'] = array($data['handle']);
+			}
+
+			$output = NULL;
+
+			foreach($data['relation_id'] as $k => $v){
+				$link = Widget::Anchor($data['value'][$k], URL . '/symphony/extension/nestedcats/list/view/' . $data['relation_id'][$k]);
+				$output .= $link->generate() . ' ';
+			}
+
+			return trim($output);
+
 		}
 
 
@@ -109,6 +97,7 @@
 			  $result['relation_id'][] = $data[$a];
 			  $cat = $this->_driver->get($value);
 			  $result['value'][] = $cat['title'];
+			  $result['handle'][] = $cat['handle'];
 			}
 
 			return $result;
@@ -122,14 +111,14 @@
 
 			if (!is_array($data['relation_id'])) {
 				$data['relation_id'] = array($data['relation_id']);
-				//$data['handle'] = array($data['handle']);
+				$data['handle'] = array($data['handle']);
 				$data['value'] = array($data['value']);
 			}
 
 			foreach ($data['relation_id'] as $k => $v) {
 				$list->appendChild(new XMLElement('item', General::sanitize($data['value'][$k]), array(
-					//'handle'	=> $data['handle'][$k],
-					'id'		=> $v,
+					'handle'	=> $data['handle'][$k],
+					'id' => $v,
 				)));
 			}
 
@@ -164,7 +153,7 @@
 		function displaySettingsPanel(&$wrapper, $errors=NULL){
 			parent::displaySettingsPanel($wrapper, $errors);
 			$div = new XMLElement('div', NULL, array('class' => 'group'));
-			$label = Widget::Label('Root');
+			$label = Widget::Label(__('Root'));
 
 			$sectionManager = new SectionManager($this->_engine);
 			$sections = $sectionManager->fetch(NULL, 'ASC', 'name');
@@ -237,33 +226,27 @@
 
 			$field_id = $this->get('id');
 
-			if($tree = $this->_driver->fetch($data[0])) {
-				$cats = array();
-				foreach($tree as $cat) {
-					$cats[] = $cat['id'];
-				}
-				unset($tree);
+			$mode = is_numeric($data[0]) ? 'id' : 'handle';
 
+			$tree = ($mode == 'id') ? $this->_driver->fetch($data[0]) : $this->_driver->fetchByHandle($data[0]);
+			if(!$tree) return false;
+
+			$cats = array();
+			foreach($tree as $cat) {
+				$cats[] = "'$cat[$mode]'";
 			}
+			unset($tree);
 
 			if(!$cats) return false;
 
-			if($andOperation): NULL; ### Disabled for now
-/*
-				foreach($data as $key => $bit){
+			$joins .= " LEFT JOIN `tbl_entries_data_$field_id` AS `t$field_id` ON (`e`.`id` = `t$field_id`.entry_id) ";
 
-					$joins .= " LEFT JOIN `tbl_entries_data_$field_id` AS `t$field_id$key` ON (`e`.`id` = `t$field_id$key`.entry_id) ";
-					//$where .= " AND `t$field_id$key`.relation_id = '$bit' ";
-					$where .= " AND `t$field_id$key`.handle = '$bit' ";
-				}
-*/
-			else:
+			if($mode == 'handle') {
+				$where .= " AND `t$field_id`.handle IN (".@implode(', ', $cats).") ";
+				return true;
+			}
 
-				$joins .= " LEFT JOIN `tbl_entries_data_$field_id` AS `t$field_id` ON (`e`.`id` = `t$field_id`.entry_id) ";
-				$where .= " AND `t$field_id`.relation_id IN (".@implode(', ', $cats).") ";
-
-			endif;
-
+			$where .= " AND `t$field_id`.relation_id IN (".@implode(', ', $cats).") ";
 			return true;
 
 		}

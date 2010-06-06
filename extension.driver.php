@@ -3,19 +3,19 @@
 	Class extension_nestedcats extends Extension{
 
 		public function about(){
-			return array('name' => __('Nested Cats beta2'),
-						 'version' => '2.0',
+			return array('name' => __('Nested Categories β2'),
+						 'version' => '2.0.1',
 						 'release-date' => '2010-03-04',
 						 'author' => array('name' => 'Andrey Lubinov',
 								   'email' => 'andrey.lubinov@gmail.com')
 				 		);
 		}
 
-    public $extension_handle = 'nestedcats';
+		public $extension_handle = 'nestedcats';
 
 		public function install(){
 
-			$this->_Parent->Database->query("CREATE TABLE IF NOT EXISTS `tbl_{$this->extension_handle}` (
+			Symphony::Database()->query("CREATE TABLE IF NOT EXISTS `tbl_{$this->extension_handle}` (
 						`id` int(11) NOT NULL auto_increment,
 						`parent` int(11) NOT NULL,
 						`lft` int(11) NOT NULL,
@@ -28,7 +28,7 @@
 					) ENGINE=MyISAM  DEFAULT CHARSET=utf8
 			");
 
-			$this->_Parent->Database->query("CREATE TABLE IF NOT EXISTS `tbl_fields_{$this->extension_handle}` (
+			Symphony::Database()->query("CREATE TABLE IF NOT EXISTS `tbl_fields_{$this->extension_handle}` (
 				`id` int(11) unsigned NOT NULL auto_increment,
 				`field_id` int(11) unsigned NOT NULL,
 				`related_field_id` VARCHAR(255) NOT NULL,
@@ -41,32 +41,84 @@
 		}
 
 		public function uninstall(){
- 			$this->_Parent->Database->query("DROP TABLE IF EXISTS `tbl_fields_{$this->extension_handle}`");
-			$this->_Parent->Database->query("DROP TABLE IF EXISTS `tbl_{$this->extension_handle}`");
-			$this->_Parent->Database->query("DELETE FROM `tbl_fields` WHERE `type` = '{$this->extension_handle}'");
+ 			Symphony::Database()->query("DROP TABLE IF EXISTS `tbl_fields_{$this->extension_handle}`");
+			Symphony::Database()->query("DROP TABLE IF EXISTS `tbl_{$this->extension_handle}`");
+			Symphony::Database()->query("DELETE FROM `tbl_fields` WHERE `type` = '{$this->extension_handle}'");
+		}
+
+		public function update($previousVersion){
+
+			if(version_compare($previousVersion, '2.0.1', '<')){
+				try{
+
+					$cats = Symphony::Database()->fetch("SELECT `lft`, `title` FROM `tbl_{$this->extension_handle}`");
+
+					if(!empty($cats) && is_array($cats)) foreach($cats as $c){
+						Symphony::Database()->query("UPDATE `tbl_{$this->extension_handle}`
+							SET `handle` = '".$this->makeUniqueHandle($c['title'], $c['lft'])."' WHERE `lft` = {$c['lft']}
+						");
+					}
+
+					$fields = Symphony::Database()->fetchCol('field_id',
+						"SELECT `field_id` FROM `tbl_fields_{$this->extension_handle}`"
+					);
+
+					if(!empty($fields) && is_array($fields)) {
+						foreach ($fields as $field_id) {
+
+							Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$field_id}` CHANGE `handle` `handle` VARCHAR( 255 )");
+							Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$field_id}` CHANGE `value` `value` VARCHAR( 255 )");
+
+							$data = Symphony::Database()->fetch("
+								SELECT DISTINCT
+									fields.relation_id AS `rel`,
+									cats.handle AS `handle`
+								FROM `tbl_entries_data_23` AS `fields`
+								LEFT JOIN `tbl_{$this->extension_handle}` AS `cats` ON fields.relation_id = cats.id
+							");
+
+							if(!empty($data) && is_array($data)) foreach($data as $v){
+								Symphony::Database()->query("UPDATE `tbl_entries_data_{$field_id}`
+									SET `handle` = '{$v['handle']}' WHERE `relation_id` = {$v['rel']}
+								");
+							}
+
+						}
+					}
+
+
+
+				}
+				catch(Exception $e){
+					// Discard
+				}
+			}
+
+			return true;
+
 		}
 
 		public function fetchNavigation(){
-			return array(
-				array(
-					'location' => 10,
-					'name' => __('Categories'),
-					'children' => array(
+				return array(
 						array(
-							'name' => __('List View'),
-							'link' => '/list/'
-						),
-						array(
-							'name' => __('Tree View'),
-							'link' => '/tree/'
-						),
-					)
-				)
-			);
+								'location' => 10,
+								'name' => __('Categories'),
+								'children' => array(
+										array(
+												'name' => __('List View'),
+												'link' => '/list/'
+										),
+										array(
+												'name' => __('Tree View'),
+												'link' => '/tree/'
+										),
+								)
+						)
+				);
 		}
 
 		public function get($id) {
-			return  $this->_Parent->Database->fetchRow(0,"
+			return Symphony::Database()->fetchRow(0,"
 						SELECT * FROM `tbl_{$this->extension_handle}`
 						WHERE `id` = $id
 						LIMIT 1
@@ -77,7 +129,7 @@
 			$where = null;
 			if($id){
 
-				$c = $this->_Parent->Database->fetchRow(0, "
+				$c = Symphony::Database()->fetchRow(0, "
 						SELECT `lft`, `rgt` FROM `tbl_{$this->extension_handle}`
 						WHERE `id` = $id LIMIT 1
 					");
@@ -87,12 +139,30 @@
 				$where = $includeCurrent ?
 					" WHERE `lft` >= {$c['lft']} AND `rgt` <= {$c['rgt']}" : " WHERE `lft` > {$c['lft']} AND `rgt` < {$c['rgt']}";
 			}
-			return $this->_Parent->Database->fetch("SELECT * FROM `tbl_{$this->extension_handle}`" . $where . " ORDER BY `lft` ASC");
+			return Symphony::Database()->fetch("SELECT * FROM `tbl_{$this->extension_handle}`" . $where . " ORDER BY `lft` ASC");
+		}
+
+		public function fetchByHandle($handle){
+
+			$c = Symphony::Database()->fetchRow(0, "
+					SELECT `lft`, `rgt` FROM `tbl_{$this->extension_handle}`
+					WHERE `handle` = '$handle'
+					LIMIT 1
+			");
+
+			if(empty($c)) return false;
+
+			return Symphony::Database()->fetch("
+				SELECT `handle` FROM `tbl_{$this->extension_handle}`
+				WHERE `lft` >= {$c['lft']} AND `rgt` <= {$c['rgt']}
+				ORDER BY `lft` ASC
+			");
+
 		}
 
 		public function fetchWithExclude($exclude){
 
-			return $data = $this->_Parent->Database->fetch("
+			return $data = Symphony::Database()->fetch("
 					SELECT * FROM `tbl_{$this->extension_handle}`
 					WHERE `lft` NOT BETWEEN {$exclude['lft']} AND {$exclude['rgt']}
 					ORDER BY `lft` ASC
@@ -101,47 +171,48 @@
 		}
 
 		public function fetchByParent($parent) {
-			return $this->_Parent->Database->fetch("
+			return Symphony::Database()->fetch("
 						SELECT * FROM `tbl_{$this->extension_handle}`
 						WHERE parent = $parent
 						ORDER BY `lft` ASC
 			");
 		}
 
-    public function getPath($id) {
+		public function getPath($id) {
 
-      if(!$cat = $this->_Parent->Database->fetchRow(0, "
-            SELECT `lft`, `rgt`
-            FROM tbl_{$this->extension_handle}
-            WHERE `id` = $id
-            LIMIT 1
-      ")) return false;
+			if(!$cat = Symphony::Database()->fetchRow(0, "
+						SELECT `lft`, `rgt`
+						FROM tbl_{$this->extension_handle}
+						WHERE `id` = $id
+						LIMIT 1
+			")) return false;
 
-      return $this->_Parent->Database->fetch("
-            SELECT * FROM `tbl_{$this->extension_handle}`
-            WHERE `lft` <= {$cat['lft']} AND `rgt` >= {$cat['rgt']}
-            ORDER BY `lft`
-      ");
-    }
+			return Symphony::Database()->fetch("
+						SELECT * FROM `tbl_{$this->extension_handle}`
+						WHERE `lft` <= {$cat['lft']} AND `rgt` >= {$cat['rgt']}
+						ORDER BY `lft`
+			");
+		}
 
 		public function newCat($fields){
 
 			if($fields['parent'] == 0) {
 
-				if(!$rgt = $this->_Parent->Database->fetchVar("max", 0, "
+				if(!$rgt = Symphony::Database()->fetchVar("max", 0, "
 						SELECT MAX(`rgt`) AS `max`
 						FROM `tbl_{$this->extension_handle}`
 						LIMIT 1
 				")) $rgt = 0;
 
-				return $this->_Parent->Database->query("
+				return Symphony::Database()->query("
 						INSERT INTO `tbl_{$this->extension_handle}`
 						SET `parent` = 0,
 								`lft` = $rgt + 1,
 								`rgt` = $rgt + 2,
 								`level` = 0,
-								`title` = '".General::sanitize(mysql_real_escape_string($fields['title']))."'
-				") or die('Ошибка при создании №1' . mysql_error());
+								`title` = '" . $this->makeTitle($fields['title']) . "',
+								`handle` = '" . $this->makeUniqueHandle($fields['title']) . "'
+				");
 
 			} else {
 
@@ -161,15 +232,16 @@
 													END
 					WHERE `rgt` >= {$fields['rgt']}";
 
-				$this->_Parent->Database->query($sql);
+				Symphony::Database()->query($sql);
 
-				return $this->_Parent->Database->query("INSERT INTO `tbl_{$this->extension_handle}`
+				return Symphony::Database()->query("INSERT INTO `tbl_{$this->extension_handle}`
 					SET `lft` = {$fields['rgt']},
 							`rgt` = {$fields['rgt']} + 1,
 							`level` = {$fields['level']} + 1,
 							`parent` = {$fields['parent']},
-							`title` = '{$fields['title']}'
-				") or die('Ошибка при создании №2' . mysql_error());
+							`title` = '" . $this->makeTitle($fields['title']) . "',
+							`handle` = '" . $this->makeUniqueHandle($fields['title']) . "'
+				");
 
 			}
 		}
@@ -183,7 +255,7 @@
 
 			if(@array_key_exists('edit', $post['action'])){
 
-					if($post['fields']['parent'] == $this->_Parent->Database->fetchVar("parent", 0, "
+					if($post['fields']['parent'] == Symphony::Database()->fetchVar("parent", 0, "
 							SELECT `parent` AS `parent` FROM `tbl_{$this->extension_handle}`
 							WHERE `lft` = {$post['fields']['lft']} LIMIT 1
 						")) return $this->updateCat($post['fields']['lft'], $post['fields']['title']);
@@ -198,16 +270,17 @@
 
 			if($fields['parent'] == 0){
 
-				if(!$rgt = $this->_Parent->Database->fetchVar("max", 0, "
+				if(!$rgt = Symphony::Database()->fetchVar("max", 0, "
 						SELECT MAX(`rgt`) AS `max`
 						FROM `tbl_{$this->extension_handle}`
 						LIMIT 1
 				")) return false;
 
-				$this->_Parent->Database->query("
+				Symphony::Database()->query("
 						UPDATE `tbl_{$this->extension_handle}`
 						SET
-							`title` = '{$fields['title']}',
+							`title` = '" . $this->makeTitle($fields['title']) . "',
+							`handle` = '" . $this->makeUniqueHandle($fields['title'], $fields['lft']) . "',
 							`parent` = 0,
 							`lft` = $rgt+1,
 							`level` = 0
@@ -218,15 +291,16 @@
 
 			}
 
-			if(!$newp = $this->_Parent->Database->fetchRow(0, "
+			if(!$newp = Symphony::Database()->fetchRow(0, "
 											SELECT `id`, `level`, `rgt` FROM `tbl_{$this->extension_handle}`
 											WHERE `id` = {$fields['parent']} LIMIT 1
 				")) return false;
 
-			$this->_Parent->Database->query("
+			Symphony::Database()->query("
 					UPDATE `tbl_{$this->extension_handle}`
 					SET
-						`title` = '{$fields['title']}',
+						`title` = '" . $this->makeTitle($fields['title']) . "',
+						`handle` = '" . $this->makeUniqueHandle($fields['title'], $fields['lft']) . "',
 						`parent` = {$newp['id']},
 						`lft` = {$newp['rgt']},
 						`level` = {$newp['level']} + 1
@@ -238,8 +312,11 @@
 
 
 		public function updateCat($lft, $title){
-			return $this->_Parent->Database->query("
-					UPDATE `tbl_{$this->extension_handle}` SET `title` = '".General::sanitize(mysql_real_escape_string($title))."'
+			return Symphony::Database()->query("
+					UPDATE `tbl_{$this->extension_handle}`
+					SET
+						`title` = '" . $this->makeTitle($title) . "',
+						`handle` = '" . $this->makeUniqueHandle($title, $lft) . "'
 					WHERE `lft` = $lft
 			");
 		}
@@ -262,11 +339,11 @@
 
 			}
 
-			$this->_Parent->Database->delete("tbl_{$this->extension_handle}", '
+			Symphony::Database()->delete("tbl_{$this->extension_handle}", '
 					`lft` >= '.$lft.' AND `rgt` <= '.$rgt.'
 				');
 
-			return $this->_Parent->Database->query("
+			return Symphony::Database()->query("
 					UPDATE `tbl_{$this->extension_handle}`
 					SET `lft` =  CASE
 															WHEN `lft` > $lft
@@ -275,7 +352,7 @@
 														END,
 							`rgt` = `rgt` - ( $rgt - $lft + 1 )
 					WHERE `rgt` > $rgt
-			") or die('Ошибка при удалении №1' . mysql_error());
+			");
 
 		}
 
@@ -286,20 +363,20 @@
 			$rgt = $post['rgt'];
 
 			foreach($post['items'] as $cat => $v){
-				$this->_Parent->Database->delete("tbl_{$this->extension_handle}", "
+				Symphony::Database()->delete("tbl_{$this->extension_handle}", "
 					(`lft` >= {$lft[$cat]} AND `rgt` <= {$rgt[$cat]})
 				");
 			}
 
 			$this->rebuildTree(0, 0);
-			return $this->_Parent->Database->query("OPTIMIZE TABLE `tbl_{$this->extension_handle}`");
+			return Symphony::Database()->query("OPTIMIZE TABLE `tbl_{$this->extension_handle}`");
 
 		}
 
 
 		function rebuildTree($parent, $lft) {
 
-			$cats = $this->_Parent->Database->fetch("
+			$cats = Symphony::Database()->fetch("
 					SELECT `id` FROM `tbl_{$this->extension_handle}`
 					WHERE `parent` = $parent
 					ORDER BY `lft` ASC
@@ -308,7 +385,7 @@
 			foreach ($cats as $cat) {
 				$rgt = $this->rebuildTree($cat['id'], $rgt);
 			}
-			$this->_Parent->Database->query("
+			Symphony::Database()->query("
 					UPDATE `tbl_{$this->extension_handle}`
 					SET `lft` = $lft, `rgt` = $rgt
 					WHERE `id` = $parent
@@ -397,23 +474,23 @@ array(URL . '/symphony/extension/nestedcats/list/')));
 		}
 
 
-    public function buildListView($data) {
+		public function buildListView($data) {
 
-      foreach($data as $cat){
+			foreach($data as $cat){
 
-        $title = $cat['rgt'] == ($cat['lft'] + 1) ? $cat['title'] : $cat['title'] . ' &#8594;';
+				$title = $cat['rgt'] == ($cat['lft'] + 1) ? $cat['title'] : $cat['title'] . ' &#8594;';
 
-        $item = Widget::TableData(Widget::Anchor($title, URL . '/symphony/extension/nestedcats/list/view/' . $cat['id'] . '/', __('View Category: ') . $cat['title'], $class));
-        $item->appendChild(Widget::Input('items['.$cat['id'].']', NULL, 'checkbox'));
-        $item->appendChild(Widget::Input('lft['.$cat['id'].']', $cat['lft'], 'text'));
-        $item->appendChild(Widget::Input('rgt['.$cat['id'].']', $cat['rgt'], 'text'));
+				$item = Widget::TableData(Widget::Anchor($title, URL . '/symphony/extension/nestedcats/list/view/' . $cat['id'] . '/', __('View Category: ') . $cat['title'], $class));
+				$item->appendChild(Widget::Input('items['.$cat['id'].']', NULL, 'checkbox'));
+				$item->appendChild(Widget::Input('lft['.$cat['id'].']', $cat['lft'], 'text'));
+				$item->appendChild(Widget::Input('rgt['.$cat['id'].']', $cat['rgt'], 'text'));
 
-        $result[] = Widget::TableRow(array($item), ($bEven ? 'even' : NULL));
-        $bEven = !$bEven;
+				$result[] = Widget::TableRow(array($item), ($bEven ? 'even' : NULL));
+				$bEven = !$bEven;
 
-      }
-      return $result;
-    }
+			}
+			return $result;
+		}
 
 
     public function buildTreeView($data) {
@@ -443,7 +520,7 @@ array(URL . '/symphony/extension/nestedcats/list/')));
 			$right = array($tree[0]['rgt']);
 
 			if(!$settingsPannel) {
-				$options = array(array(NULL,NULL,'None'));
+				$options = array(array(NULL,NULL, __('None')));
 			} elseif ($settingsPannel && count($tree) == 1) {
 
 				return new XMLElement('p', __('It looks like youre trying to create a field. Perhaps you want categories first? <br/><a href="%s">Click here to create some.</a>', array(URL . '/symphony/extension/nestedcats/overview/new/')));
@@ -485,7 +562,26 @@ array(URL . '/symphony/extension/nestedcats/list/')));
 				);
 		}
 
+		function makeUniqueHandle($title, $lft=false){
+			$handle = Lang::createHandle($title);
 
+			if(!$this->handleExists($handle, $lft)) return $handle;
+
+			$count = 2;
+ 			while ($this->handleExists("{$handle}-{$count}", $lft)) $count++;
+
+			return "{$handle}-{$count}";
+
+		}
+
+		private function handleExists($handle, $lft=false){
+			return (boolean)$exists = Symphony::Database()->fetchVar('count', 0, "
+				SELECT count(*) AS `count`
+				FROM `tbl_{$this->extension_handle}`
+				WHERE `handle` = '$handle'
+				" . ($lft ? " AND `lft` !=$lft" : null)
+			);
+		}
 
 
 }

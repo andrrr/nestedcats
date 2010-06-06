@@ -37,15 +37,14 @@
 			if(isset($this->_flag)){
 				$result = null;
 				switch($this->_flag){
-					case 'edited': $result = __('%1$s edited at %2$s.'); break;
-					case 'deleted': $result = __('%1$s deleted'); break;
-					case 'created': $result = __('%1$s created at %2$s. <a href="%3$s">Create another?</a>'); break;
+					case 'edited': $result = __('Category updated at %1$s.'); break;
+					case 'deleted': $result = __('Category deleted'); break;
+					case 'created': $result = __('Category created at %1$s. <a href="%2$s">Create another?</a>'); break;
 				}
 
 				if ($result)
 						$this->pageAlert(__(
 							$result, array(
-								__('Category'),
 								DateTimeObj::get(__SYM_TIME_FORMAT__),
 								BASE_URL . '/list/new/'.$this->_id,
 							)
@@ -69,7 +68,7 @@
 			$this->setTitle(__('Symphony &ndash; Categories &ndash; View'));
 			$this->setPageType('table');
 
-			$this->appendSubheading(__('List'), Widget::Anchor(__('Create new'), BASE_URL . '/list/new/' . $this->_id, __('Create new'), 'create button'));
+			$this->appendSubheading(__('List'), Widget::Anchor(__('Create New'), BASE_URL . '/list/new/' . $this->_id, __('Create New'), 'create button'));
 
 			$data = $this->_driver->fetchByParent($this->_id);
 
@@ -83,33 +82,33 @@
 					$ul->setAttribute('class','nc-breadcrumbs');
 
 					$li = new XMLElement('li');
-					$li->appendChild(Widget::Anchor('Full List &#8594;', BASE_URL . '/list/view/', 'To the begining'));
+					$li->appendChild(Widget::Anchor(__('Full list &#8594;'), BASE_URL . '/list/view/', __('To the begining')));
 					$ul->appendChild($li);
 
 					foreach($path as $c){
 						$li = new XMLElement('li');
 
 						if($c['id'] == $this->_id){
-							$a = Widget::Anchor($c['title'], BASE_URL . '/list/edit/' . $c['id'], 'Edit');
+							$a = Widget::Anchor($c['title'], BASE_URL . '/list/edit/' . $c['id'], __('Edit'));
 						} else {
-							$a = Widget::Anchor($c['title'] . ' &#8594;', BASE_URL . '/list/view/' . $c['id'], 'Categories: ' . $c['title']);
+							$a = Widget::Anchor($c['title'] . ' &#8594;', BASE_URL . '/list/view/' . $c['id'], __('Categories: ') . $c['title']);
 						}
 						$li->appendChild($a);
 						$ul->appendChild($li);
 					}
 					$this->Form->appendChild($ul);
 				}else{
-					$this->Form->appendChild(new XMLElement('h2', 'Can\'t find category'));
+					$this->Form->appendChild(new XMLElement('h2', __('Can\'t find category')));
 				}
 
 			} else {
-				$this->aTableHead = array(array('Title', 'col'));
+				$this->aTableHead = array(array(__('Title'), 'col'));
 			}
 
 			if($data){
 				$aTableBody = $this->_driver->buildListView($data);
 			} else {
-				$aTableBody = array(Widget::TableRow(array(Widget::TableData('None Found.', 'inactive', NULL, count($this->aTableHead)))));
+				$aTableBody = array(Widget::TableRow(array(Widget::TableData(__('None found.'), 'inactive', NULL, count($this->aTableHead)))));
 			}
 
 			$pid = 'pid' . $this->_id;
@@ -122,16 +121,16 @@
 			$tableActions->setAttribute('class', 'actions');
 
 			$options = array(
-				array(NULL, false, 'With selected...'),
-				array('delete', false, 'Delete')
+				array(NULL, false, __('With Selected...')),
+				array('delete', false, __('Delete'))
 			);
 
 			$wrapDiv = new XMLElement('div');
 			$wrapDiv->appendChild(Widget::Select('with-selected', $options, array('id' => 'sel')));
-			$wrapDiv->appendChild(Widget::Input('action[apply]', 'Apply', 'submit'));
+			$wrapDiv->appendChild(Widget::Input('action[apply]', __('Apply'), 'submit'));
 			$tableActions->appendChild($wrapDiv);
 
-			$notice = new XMLElement('p', 'All nested Categores will be also deleted');
+			$notice = new XMLElement('p', __('All nested Categores will be also deleted'));
 			$notice->setAttribute('id', 'note');
 			$notice->setAttribute('class', 'hidden');
 
@@ -145,12 +144,12 @@
 			$this->addStylesheetToHead(EXTENSION . '/assets/nestedcats.css', 'screen', 120);
 			$this->addScriptToHead(EXTENSION . '/assets/nestedcats.js', 200);
 	//     $this->addScriptToHead(EXTENSION . '/assets/order.js', 210);
-			$this->setTitle('Symphony &ndash; New Category');
+			$this->setTitle(__('Symphony &ndash; New Category'));
 
 			$this->setPageType('form');
 			$this->Form->setAttribute('enctype', 'multipart/form-data');
 
-			$this->appendSubheading('New Category');
+			$this->appendSubheading(__('New Category'));
 
 			if($this->_id) $parent = $this->_driver->get($this->_id);
 
@@ -158,11 +157,11 @@
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'primary');
 
-			$label = Widget::Label('Title');
+			$label = Widget::Label(__('Title'));
 			$label->appendChild(Widget::Input('fields[title]', $_POST['fields']['title'], 'text'));
 
 			if($this->_errors['title']){
-				$label = Widget::wrapFormElementWithError($label, 'It is a required field');
+				$label = Widget::wrapFormElementWithError($label, __('This is a required field'));
 			}
 
 			$fieldset->appendChild($label);
@@ -178,8 +177,8 @@
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'secondary');
 
-			$label = Widget::Label('Parent Category');
-			$label->appendChild(Widget::Input(Null, $parent['title'] ? $parent['title'] : 'None', 'text', array('disabled' => 'true')));
+			$label = Widget::Label(__('Parent Category'));
+			$label->appendChild(Widget::Input(Null, $parent['title'] ? $parent['title'] : __('None'), 'text', array('disabled' => 'true')));
 
 			$fieldset->appendChild($label);
 			$this->Form->appendChild($fieldset);
@@ -187,7 +186,7 @@
 			// Submit
 			$div = new XMLElement('div');
 			$div->setAttribute('class', 'actions');
-			$div->appendChild(Widget::Input('action[save]', 'Create', 'submit', array('accesskey' => 's')));
+			$div->appendChild(Widget::Input('action[save]', __('Create'), 'submit', array('accesskey' => 's')));
 
 			$this->Form->appendChild($div);
 
@@ -201,12 +200,12 @@
 			$this->addStylesheetToHead(EXTENSION . '/assets/nestedcats.css', 'screen', 120);
 			$this->addScriptToHead(EXTENSION . '/assets/nestedcats.js', 200);
 	//     $this->addScriptToHead(EXTENSION . '/assets/order.js', 210);
-			$this->setTitle('Symphony &ndash; Edit Categories &ndash; ' . $cat['title']);
+			$this->setTitle(__('Symphony &ndash; Edit Category &ndash; ') . $cat['title']);
 
 			$this->setPageType('form');
 			$this->Form->setAttribute('enctype', 'multipart/form-data');
 
-			$this->appendSubheading('Edit category "' . $cat['title'] . '"');
+			$this->appendSubheading(__('Edit Category ') . $cat['title']);
 
 			// breadcrumbs
 			if($path = $this->_driver->getPath($this->_id)){
@@ -214,7 +213,7 @@
 				$ul->setAttribute('class','nc-breadcrumbs');
 
 				$li = new XMLElement('li');
-				$li->appendChild(Widget::Anchor('Full list &#8594;', BASE_URL . '/list/view/', 'To the begining'));
+				$li->appendChild(Widget::Anchor(__('Full list &#8594;'), BASE_URL . '/list/view/', __('To the begining')));
 				$ul->appendChild($li);
 
 				foreach($path as $c){
@@ -223,7 +222,7 @@
 					if($c['id'] == $this->_id){
 						$a = new XMLElement('span', $c['title']);
 					} else {
-						$a = Widget::Anchor($c['title'] . ' &#8594;', BASE_URL . '/list/view/' . $c['id'], 'Category: ' . $c['title']);
+						$a = Widget::Anchor($c['title'] . ' &#8594;', BASE_URL . '/list/view/' . $c['id'], __('Category: ') . $c['title']);
 					}
 					$li->appendChild($a);
 					$ul->appendChild($li);
@@ -235,11 +234,11 @@
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'primary');
 
-			$label = Widget::Label('Title');
+			$label = Widget::Label(__('Title'));
 			$label->appendChild(Widget::Input('fields[title]', $cat['title'], 'text'));
 
 			if($this->_errors['title']){
-				$label = Widget::wrapFormElementWithError($label, 'It is a required field');
+				$label = Widget::wrapFormElementWithError($label, __('This is a required field'));
 			}
 
 			$fieldset->appendChild($label);
@@ -258,8 +257,8 @@
 
 			$parent = $this->_driver->get($cat['parent']);
 
-			$label = Widget::Label('Parent Category');
-			$label->appendChild(Widget::Input(Null, $cat['parent'] == 0 ? 'None' : $parent['title'], 'text', array('disabled' => 'true')));
+			$label = Widget::Label(__('Parent Category'));
+			$label->appendChild(Widget::Input(Null, $cat['parent'] == 0 ? __('None') : $parent['title'], 'text', array('disabled' => 'true')));
 
 			$fieldset->appendChild($label);
 			$this->Form->appendChild($fieldset);
@@ -269,7 +268,7 @@
 			// Submit
 			$div = new XMLElement('div');
 			$div->setAttribute('class', 'actions');
-			$div->appendChild(Widget::Input('action[update]', 'Save', 'submit', array('accesskey' => 's')));
+			$div->appendChild(Widget::Input('action[update]', __('Save'), 'submit', array('accesskey' => 's')));
 
 			$button = new XMLElement('button', __('Delete'));
 			$button->setAttributeArray(array('name' => 'action[delete]', 'class' => 'confirm delete', 'title' => __('Delete this Category')));
@@ -292,7 +291,7 @@
 
 			if(empty($_POST['fields']['title'])) {
 				$this->_errors = 'title';
-				$this->pageAlert('Title is required', Alert::ERROR);
+				$this->pageAlert(__('Title is a required field'), Alert::ERROR);
 				return;
 			}
 
@@ -309,7 +308,7 @@
 			if(@array_key_exists('update', $_POST['action'])){
 				if(empty($_POST['fields']['title'])) {
 					$this->_errors = 'title';
-					$this->pageAlert('Title is required', Alert::ERROR);
+					$this->pageAlert(__('Title is a required field'), Alert::ERROR);
 					return;
 				}
 
