@@ -63,7 +63,7 @@
 		'Can\'t find category' =>
 		'Невозможно найти такую категорию',
 
-		'All nested Categores will be also deleted' =>
+		'All nested Categories will be also deleted' =>
 		'Все вложенные категории тоже будут удалены',
 
 		'Symphony &ndash; New Category' =>

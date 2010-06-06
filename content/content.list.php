@@ -130,7 +130,7 @@
 			$wrapDiv->appendChild(Widget::Input('action[apply]', __('Apply'), 'submit'));
 			$tableActions->appendChild($wrapDiv);
 
-			$notice = new XMLElement('p', __('All nested Categores will be also deleted'));
+			$notice = new XMLElement('p', __('All nested Categories will be also deleted'));
 			$notice->setAttribute('id', 'note');
 			$notice->setAttribute('class', 'hidden');
 
