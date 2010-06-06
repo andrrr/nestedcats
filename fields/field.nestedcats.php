@@ -259,8 +259,8 @@
 				`id` int(11) unsigned NOT NULL auto_increment,
 				`entry_id` int(11) unsigned NOT NULL,
 				`relation_id` int(11) unsigned NOT NULL,
-				`handle` varchar(50) NOT NULL,
-				`value` varchar(250) NOT NULL,
+				`handle` varchar(255) NOT NULL,
+				`value` varchar(255) NOT NULL,
 				PRIMARY KEY  (`id`),
 				KEY `entry_id` (`entry_id`),
 				KEY `relation_id` (`relation_id`)
