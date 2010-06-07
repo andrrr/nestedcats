@@ -2,12 +2,11 @@
 
 	Class datasourceNestedCats extends Datasource{
 
-		public $dsTITLE = 'Nested Categories';
 		public $dsParamROOTELEMENT = 'nested-categories';
-
 		public $dsParamFILTERS = array(
 				'filter' => '{$cat}',
 		);
+		public $dsParamROOTNODE = '0'; // id or handle of the root category to be displayed as "main-tree"
 
 		public function __construct(&$parent, $env=NULL, $process_params=true){
 			parent::__construct($parent, $env, $process_params);
@@ -48,8 +47,8 @@ Usage Example:
 		function about(){
 
 			return array(
-				"name" => __($this->dsTITLE),
-				"description" => __($this->dsTITLE),
+				"name" => __('Nested Categories'),
+				"description" => __('Nested Categories Data Source'),
 				"author" => array("name" => "Andrey Lubinov",
 					"email" => "andrey.lubinov@gmail.com"),
 					"version" => "2.0.1",
@@ -58,13 +57,12 @@ Usage Example:
 		}
 
 		function grab(&$param_pool=NULL){
-
 			include_once(EXTENSIONS . '/nestedcats/extension.driver.php');
 			$driver = $this->_Parent->ExtensionManager->create('nestedcats');
 
 			$xml = new XMLElement($this->dsParamROOTELEMENT);
 
-			if(!$data = $driver->fetch(0)) return $xml->appendChild(new XMLElement('error', __('No data received.')));
+			if(!$data = $driver->fetch($this->dsParamROOTNODE)) return $xml->appendChild(new XMLElement('error', __('No data received.')));
 
 			$main_tree = new XMLElement('main-tree');
 			foreach($data as $c) {

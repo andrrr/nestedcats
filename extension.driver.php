@@ -55,7 +55,7 @@
 
 					if(!empty($cats) && is_array($cats)) foreach($cats as $c){
 						Symphony::Database()->query("UPDATE `tbl_{$this->extension_handle}`
-							SET `handle` = '".$this->makeUniqueHandle($c['title'], $c['lft'])."' WHERE `lft` = {$c['lft']}
+							SET `handle` = '".$this->getUniqueHandle($c['title'], $c['lft'])."' WHERE `lft` = {$c['lft']}
 						");
 					}
 
@@ -214,7 +214,7 @@
 								`rgt` = $rgt + 2,
 								`level` = 0,
 								`title` = '" . $this->makeTitle($fields['title']) . "',
-								`handle` = '" . $this->makeUniqueHandle($fields['title']) . "'
+								`handle` = '" . $this->getUniqueHandle($fields['title']) . "'
 				");
 
 			} else {
@@ -243,7 +243,7 @@
 							`level` = {$fields['level']} + 1,
 							`parent` = {$fields['parent']},
 							`title` = '" . $this->makeTitle($fields['title']) . "',
-							`handle` = '" . $this->makeUniqueHandle($fields['title']) . "'
+							`handle` = '" . $this->getUniqueHandle($fields['title']) . "'
 				");
 
 			}
@@ -283,7 +283,7 @@
 						UPDATE `tbl_{$this->extension_handle}`
 						SET
 							`title` = '" . $this->makeTitle($fields['title']) . "',
-							`handle` = '" . $this->makeUniqueHandle($fields['title'], $fields['lft']) . "',
+							`handle` = '" . $this->getUniqueHandle($fields['title'], $fields['lft']) . "',
 							`parent` = 0,
 							`lft` = $rgt+1,
 							`level` = 0
@@ -303,7 +303,7 @@
 					UPDATE `tbl_{$this->extension_handle}`
 					SET
 						`title` = '" . $this->makeTitle($fields['title']) . "',
-						`handle` = '" . $this->makeUniqueHandle($fields['title'], $fields['lft']) . "',
+						`handle` = '" . $this->getUniqueHandle($fields['title'], $fields['lft']) . "',
 						`parent` = {$newp['id']},
 						`lft` = {$newp['rgt']},
 						`level` = {$newp['level']} + 1
@@ -319,7 +319,7 @@
 					UPDATE `tbl_{$this->extension_handle}`
 					SET
 						`title` = '" . $this->makeTitle($title) . "',
-						`handle` = '" . $this->makeUniqueHandle($title, $lft) . "'
+						`handle` = '" . $this->getUniqueHandle($title, $lft) . "'
 					WHERE `lft` = $lft
 			");
 		}
@@ -565,7 +565,7 @@ array(URL . '/symphony/extension/nestedcats/list/')));
 				);
 		}
 
-		function makeUniqueHandle($title, $lft=false){
+		function getUniqueHandle($title, $lft=false){
 			$handle = Lang::createHandle($title);
 
 			if(!$this->handleExists($handle, $lft)) return $handle;
