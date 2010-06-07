@@ -3,10 +3,10 @@
 	Class datasourceNestedCats extends Datasource{
 
 		public $dsParamROOTELEMENT = 'nested-categories';
+		public $dsParamROOTNODE = '0'; // id or handle of the root category to be displayed as "main-tree"
 		public $dsParamFILTERS = array(
 				'filter' => '{$cat}',
 		);
-		public $dsParamROOTNODE = '0'; // id or handle of the root category to be displayed as "main-tree"
 
 		public function __construct(&$parent, $env=NULL, $process_params=true){
 			parent::__construct($parent, $env, $process_params);
@@ -59,6 +59,8 @@ Usage Example:
 		function grab(&$param_pool=NULL){
 			include_once(EXTENSIONS . '/nestedcats/extension.driver.php');
 			$driver = $this->_Parent->ExtensionManager->create('nestedcats');
+
+			// $this->dsParamROOTNODE = !empty($this->dsParamFILTERS['filter']) ? $this->dsParamFILTERS['filter'] : $this->dsParamROOTNODE;
 
 			$xml = new XMLElement($this->dsParamROOTELEMENT);
 

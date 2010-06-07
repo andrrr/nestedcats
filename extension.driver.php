@@ -156,7 +156,7 @@
 			if(empty($c)) return false;
 
 			return Symphony::Database()->fetch("
-				SELECT `handle` FROM `tbl_{$this->extension_handle}`
+				SELECT * FROM `tbl_{$this->extension_handle}`
 				WHERE `lft` >= {$c['lft']} AND `rgt` <= {$c['rgt']}
 				ORDER BY `lft` ASC
 			");
