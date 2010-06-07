@@ -153,7 +153,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 		if($this->_id) $parent = $this->_driver->get($this->_id);
 
-		// Название категории
+		// Category Title
 		$fieldset = new XMLElement('fieldset');
 		$fieldset->setAttribute('class', 'primary');
 
@@ -172,7 +172,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 		$this->Form->appendChild($fieldset);
 
-		// Родительская категория
+		// Parent Category
 		$fieldset = new XMLElement('fieldset');
 		$fieldset->setAttribute('class', 'secondary');
 
@@ -231,7 +231,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 			$this->Form->appendChild($ul);
 		}
 
-		// Название категории
+		// Category Title
 		$fieldset = new XMLElement('fieldset');
 		$fieldset->setAttribute('class', 'primary');
 
@@ -251,7 +251,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 		$this->Form->appendChild($fieldset);
 
-		// Parent
+		// Parent Category
 		$fieldset = new XMLElement('fieldset');
 		$fieldset->setAttribute('class', 'secondary');
 
@@ -266,7 +266,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 		// Submit
 		$div = new XMLElement('div');
 		$div->setAttribute('class', 'actions');
-		$div->appendChild(Widget::Input('action[edit]', __('Save'), 'submit', array('accesskey' => 's')));
+		$div->appendChild(Widget::Input('action[edit]', __('Save Changes'), 'submit', array('accesskey' => 's')));
 
 		$button = new XMLElement('button', __('Delete'));
 		$button->setAttributeArray(array('name' => 'action[delete]', 'class' => 'confirm delete', 'title' => __('Delete this Category')));

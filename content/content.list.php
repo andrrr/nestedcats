@@ -230,7 +230,7 @@
 				$this->Form->appendChild($ul);
 			}
 
-			// Название категории
+			// Category Title
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'primary');
 
@@ -251,7 +251,7 @@
 
 			$this->Form->appendChild($fieldset);
 
-			// Родительская категория
+			// Parent Category
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'secondary');
 
@@ -268,7 +268,7 @@
 			// Submit
 			$div = new XMLElement('div');
 			$div->setAttribute('class', 'actions');
-			$div->appendChild(Widget::Input('action[update]', __('Save'), 'submit', array('accesskey' => 's')));
+			$div->appendChild(Widget::Input('action[update]', __('Save Changes'), 'submit', array('accesskey' => 's')));
 
 			$button = new XMLElement('button', __('Delete'));
 			$button->setAttributeArray(array('name' => 'action[delete]', 'class' => 'confirm delete', 'title' => __('Delete this Category')));
