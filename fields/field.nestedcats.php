@@ -239,7 +239,7 @@
 
 			$mode = is_numeric($data[0]) ? 'id' : 'handle';
 
-			$tree = ($mode == 'id') ? $this->_driver->fetch($data[0]) : $this->_driver->fetchByHandle($data[0]);
+			$tree = $this->_driver->fetch($data[0]);
 			if(!$tree) return false;
 
 			$cats = array();
@@ -251,13 +251,10 @@
 			if(!$cats) return false;
 
 			$joins .= " LEFT JOIN `tbl_entries_data_$field_id` AS `t$field_id` ON (`e`.`id` = `t$field_id`.entry_id) ";
+			$where .= ($mode == 'id') ?
+				" AND `t$field_id`.relation_id IN (".@implode(',', $cats).") " :
+				" AND `t$field_id`.handle IN (".@implode(',', $cats).") ";
 
-			if($mode == 'handle') {
-				$where .= " AND `t$field_id`.handle IN (".@implode(', ', $cats).") ";
-				return true;
-			}
-
-			$where .= " AND `t$field_id`.relation_id IN (".@implode(', ', $cats).") ";
 			return true;
 
 		}

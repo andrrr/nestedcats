@@ -125,13 +125,15 @@
 			");
 		}
 
-		public function fetch($id=null, $includeCurrent=true){
+		public function fetch($val=null, $includeCurrent=true){
 			$where = null;
-			if($id){
+			if($val){
+
+				if(!is_numeric($val)) return $this->fetchByHandle($val);
 
 				$c = Symphony::Database()->fetchRow(0, "
 						SELECT `lft`, `rgt` FROM `tbl_{$this->extension_handle}`
-						WHERE `id` = $id LIMIT 1
+						WHERE `id` = $val LIMIT 1
 					");
 
 				if(empty($c)) return false;
@@ -139,6 +141,7 @@
 				$where = $includeCurrent ?
 					" WHERE `lft` >= {$c['lft']} AND `rgt` <= {$c['rgt']}" : " WHERE `lft` > {$c['lft']} AND `rgt` < {$c['rgt']}";
 			}
+
 			return Symphony::Database()->fetch("SELECT * FROM `tbl_{$this->extension_handle}`" . $where . " ORDER BY `lft` ASC");
 		}
 

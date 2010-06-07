@@ -2,7 +2,17 @@
 
 	Class datasourceNestedCats extends Datasource{
 
-		public $dsParamROOTELEMENT = 'nested-categories'; // Feel free to change value
+		public $dsTITLE = 'Nested Categories';
+		public $dsParamROOTELEMENT = 'nested-categories';
+
+		public $dsParamFILTERS = array(
+				'filter' => '{$cat}',
+		);
+
+		public function __construct(&$parent, $env=NULL, $process_params=true){
+			parent::__construct($parent, $env, $process_params);
+			$this->_dependencies = array();
+		}
 
 		function example(){
 			return '<'. $this->dsParamROOTELEMENT .'>
@@ -38,8 +48,8 @@ Usage Example:
 		function about(){
 
 			return array(
-				"name" => __('Nested Categories'),
-				"description" => __('Nested Categories'),
+				"name" => __($this->dsTITLE),
+				"description" => __($this->dsTITLE),
 				"author" => array("name" => "Andrey Lubinov",
 					"email" => "andrey.lubinov@gmail.com"),
 					"version" => "2.0.1",
@@ -47,7 +57,7 @@ Usage Example:
 			);
 		}
 
-		function grab(){
+		function grab(&$param_pool=NULL){
 
 			include_once(EXTENSIONS . '/nestedcats/extension.driver.php');
 			$driver = $this->_Parent->ExtensionManager->create('nestedcats');
