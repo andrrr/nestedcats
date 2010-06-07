@@ -2,34 +2,32 @@
 
 	Class datasourceNestedCats extends Datasource{
 
-		function __construct(&$parent){
-			parent::__construct($parent);
-		}
+		public $dsParamROOTELEMENT = 'nested-categories'; // Feel free to change value
 
 		function example(){
-			return '<nested-cats>
+			return '<'. $this->dsParamROOTELEMENT .'>
 	<main-tree>
-		<item id="7" parent-id="1" level="0">Fruits</item>
-		<item id="8" parent-id="7" level="1">Apples</item>
-		<item id="9" parent-id="7" level="1">Bananas</item>
-		<item id="10" parent-id="1" level="0">Animals</item>
-		<item id="11" parent-id="10" level="1">Giraffes</item>
-		<item id="12" parent-id="10" level="1">Pandas</item>
+		<item id="7" handle="fruits" parent-id="1" level="0">Fruits</item>
+		<item id="8" handle="apples" parent-id="7" level="1">Apples</item>
+		<item id="9" handle="bananas" parent-id="7" level="1">Bananas</item>
+		<item id="10" handle="animals" parent-id="1" level="0">Animals</item>
+		<item id="11" handle="giraffes" parent-id="10" level="1">Giraffes</item>
+		<item id="12" handle="pandas" parent-id="10" level="1">Pandas</item>
 	</main-tree>
-</nested-cats>
+</'. $this->dsParamROOTELEMENT .'>
 
-Example Usage:
+Usage Example:
 
 <ul>
-	<xsl:apply-templates select="nested-cats/main-tree/item[@level = 0]"/>
+	<xsl:apply-templates select="'. $this->dsParamROOTELEMENT .'/main-tree/item[@level = 0]"/>
 </ul>
 
-<xsl:template match="nested-cats/main-tree/item">
+<xsl:template match="'. $this->dsParamROOTELEMENT .'/main-tree/item">
 	<li>
 		<a href="{$root}/test/{@handle}"><xsl:value-of select="."/></a>
-		<xsl:if test="/data/main-tree/nested-cats/item[@parent-id = current()/@id]">
+		<xsl:if test="/data/'. $this->dsParamROOTELEMENT .'/main-tree/item[@parent-id = current()/@id]">
 			<ul>
-				<xsl:apply-templates select="/data/main-tree/nested-cats/item[@parent-id = current()/@id]"/>
+				<xsl:apply-templates select="/data/'. $this->dsParamROOTELEMENT .'/main-tree/item[@parent-id = current()/@id]"/>
 			</ul>
 		</xsl:if>
 	</li>
@@ -53,7 +51,9 @@ Example Usage:
 
 			include_once(EXTENSIONS . '/nestedcats/extension.driver.php');
 			$driver = $this->_Parent->ExtensionManager->create('nestedcats');
-			$xml = new XMLElement('nested-cats');
+
+			$xml = new XMLElement($this->dsParamROOTELEMENT);
+
 			if(!$data = $driver->fetch(0)) return $xml->appendChild(new XMLElement('error', __('No data received.')));
 
 			$main_tree = new XMLElement('main-tree');
