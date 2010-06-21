@@ -73,7 +73,7 @@
 								SELECT DISTINCT
 									fields.relation_id AS `rel`,
 									cats.handle AS `handle`
-								FROM `tbl_entries_data_23` AS `fields`
+								FROM `tbl_entries_data_{$field_id}` AS `fields`
 								LEFT JOIN `tbl_{$this->extension_handle}` AS `cats` ON fields.relation_id = cats.id
 							");
 
