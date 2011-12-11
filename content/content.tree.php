@@ -62,8 +62,8 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 	function __viewIndex(){
 
-		$this->addStylesheetToHead(EXTENSION . '/assets/nestedcats.css', 'screen', 120);
-		$this->addScriptToHead(EXTENSION . '/assets/nestedcats.js', 200);
+		$this->addStylesheetToHead(EXTENSION . '/assets/content.nestedcats.css', 'screen', 120);
+		$this->addScriptToHead(EXTENSION . '/assets/content.nestedcats.js', 200);
 //     $this->addScriptToHead(EXTENSION . '/assets/order.js', 210);
 		$this->setTitle(__('Symphony &ndash; Categories &ndash; View'));
 		$this->setPageType('table');
@@ -113,7 +113,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 		$pid = 'pid' . $this->_id;
 
-		$table = Widget::Table(Widget::TableHead($this->aTableHead), NULL, Widget::TableBody($aTableBody), NULL, $pid);
+		$table = Widget::Table(Widget::TableHead($this->aTableHead), NULL, Widget::TableBody($aTableBody), 'selectable', $pid);
 		$this->Form->appendChild($table);
 
 		// WITH SELECTED
@@ -141,8 +141,8 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 	function __viewNew(){
 
-		$this->addStylesheetToHead(URL . '/extensions/nestedcats/assets/nestedcats.css', 'screen', 120);
-		$this->addScriptToHead(URL . '/extensions/nestedcats/assets/nestedcats.js', 200);
+		$this->addStylesheetToHead(URL . '/extensions/nestedcats/assets/content.nestedcats.css', 'screen', 120);
+		$this->addScriptToHead(URL . '/extensions/nestedcats/assets/content.nestedcats.js', 200);
 //     $this->addScriptToHead(URL . '/extensions/nestedcats/assets/order.js', 210);
 		$this->setTitle(__('Symphony &ndash; New Category'));
 
@@ -197,8 +197,8 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 		if(!$cat = $this->_driver->get($this->_id)) $this->_Parent->errorPageNotFound();
 
-		$this->addStylesheetToHead(URL . '/extensions/nestedcats/assets/nestedcats.css', 'screen', 120);
-		$this->addScriptToHead(URL . '/extensions/nestedcats/assets/nestedcats.js', 200);
+		$this->addStylesheetToHead(URL . '/extensions/nestedcats/assets/content.nestedcats.css', 'screen', 120);
+		$this->addScriptToHead(URL . '/extensions/nestedcats/assets/content.nestedcats.js', 200);
 //     $this->addScriptToHead(URL . '/extensions/nestedcats/assets/order.js', 210);
 		$this->setTitle(__('Symphony &ndash; Edit Category &ndash; ') . $cat['title']);
 
