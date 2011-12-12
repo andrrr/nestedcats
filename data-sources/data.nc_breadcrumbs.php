@@ -31,10 +31,11 @@
 		function grab(&$param_pool=NULL){
 
 			$result = new XMLElement($this->dsParamROOTELEMENT);
-			$driver = Symphony::ExtensionManager()->getInstance('nestedcats');
 			$current = $this->dsParamFILTERS['current'];
 			
 			if(!(bool)$current) return $result;
+
+			$driver = Symphony::ExtensionManager()->getInstance('nestedcats');
 			
 			if(!is_numeric($current)) {
 				$current = Symphony::Database()->fetchVar('id', 0, 
