@@ -2,7 +2,7 @@
 
 require_once(TOOLKIT . '/class.administrationpage.php');
 
-define_safe('BASE_URL', URL . '/symphony/extension/nestedcats');
+define_safe('BASE_URL', SYMPHONY_URL . '/extension/nestedcats');
 define_safe('EXTENSION', URL . '/extensions/nestedcats');
 
 Class contentExtensionNestedcatsTree extends AdministrationPage{
@@ -14,9 +14,9 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 	private $aTableHead;
 
-	function __construct(&$parent){
-		parent::__construct($parent);
-		$this->_driver = $this->_Parent->ExtensionManager->create('nestedcats');
+	function __construct(){
+		parent::__construct();
+		$this->_driver = Symphony::ExtensionManager()->create('nestedcats');
 	}
 
 	function view(){
@@ -122,7 +122,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 		$options = array(
 			array(NULL, false, __('With Selected...')),
-			array('delete', false, __('Delete'))
+			array('delete', false, __('EntryPreDelete'))
 		);
 
 		$wrapDiv = new XMLElement('div');
@@ -166,9 +166,9 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 		$fieldset->appendChild($label);
 
-		$fieldset->appendChild(Widget::Input('fields[level]', $parent['level'] ? $parent['level'] : 0, 'hidden'));
-		$fieldset->appendChild(Widget::Input('fields[rgt]', $parent['rgt'] ? $parent['rgt'] : 0, 'hidden'));
-		$fieldset->appendChild(Widget::Input('fields[parent]', $parent['id'] ? $parent['id'] : 0, 'hidden'));
+		$fieldset->appendChild(Widget::Input('fields[level]', $parent['level'] ? $parent['level'] : (string)0, 'hidden'));
+		$fieldset->appendChild(Widget::Input('fields[rgt]', $parent['rgt'] ? $parent['rgt'] : (string)0, 'hidden'));
+		$fieldset->appendChild(Widget::Input('fields[parent]', $parent['id'] ? $parent['id'] : (string)0, 'hidden'));
 
 		$this->Form->appendChild($fieldset);
 
@@ -268,7 +268,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 		$div->setAttribute('class', 'actions');
 		$div->appendChild(Widget::Input('action[edit]', __('Save Changes'), 'submit', array('accesskey' => 's')));
 
-		$button = new XMLElement('button', __('Delete'));
+		$button = new XMLElement('button', __('EntryPreDelete'));
 		$button->setAttributeArray(array('name' => 'action[delete]', 'class' => 'confirm delete', 'title' => __('Delete this Category')));
 		$div->appendChild($button);
 

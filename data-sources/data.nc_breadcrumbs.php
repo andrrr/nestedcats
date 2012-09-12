@@ -7,8 +7,8 @@
 				'current' => '{$category}' // change 'category' to the name of your URL Parameter  
 		);
 
-		public function __construct(&$parent, $env=NULL, $process_params=true){
-			parent::__construct($parent, $env, $process_params);
+		public function __construct($env=NULL, $process_params=true){
+			parent::__construct($env, $process_params);
 			$this->_dependencies = array();
 		}
 

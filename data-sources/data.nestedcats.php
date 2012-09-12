@@ -8,8 +8,8 @@
 				'filter' => '{$cat}',
 		);
 
-		public function __construct(&$parent, $env=NULL, $process_params=true){
-			parent::__construct($parent, $env, $process_params);
+		public function __construct($env=NULL, $process_params=true){
+			parent::__construct($env, $process_params);
 			$this->_dependencies = array();
 		}
 
@@ -58,7 +58,7 @@ Usage Example:
 
 		function grab(&$param_pool=NULL){
 			include_once(EXTENSIONS . '/nestedcats/extension.driver.php');
-			$driver = $this->_Parent->ExtensionManager->create('nestedcats');
+			$driver = Symphony::ExtensionManager()->create('nestedcats');
 
 			// $this->dsParamROOTNODE = !empty($this->dsParamFILTERS['filter']) ? $this->dsParamFILTERS['filter'] : $this->dsParamROOTNODE;
 

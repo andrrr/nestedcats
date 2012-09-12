@@ -6,8 +6,8 @@
 
 		protected $_driver = null;
 
-		function __construct(&$parent){
-			parent::__construct($parent);
+		function __construct(){
+			parent::__construct();
 			$this->_name = __('Nested Categories');
 			$this->_required = true;
 
@@ -87,7 +87,7 @@
 			$output = NULL;
 
 			foreach($data['relation_id'] as $k => $v){
-				$link = Widget::Anchor($data['value'][$k], URL . '/symphony/extension/nestedcats/list/view/' . $data['relation_id'][$k]);
+				$link = Widget::Anchor($data['value'][$k], SYMPHONY_URL . '/extension/nestedcats/list/view/' . $data['relation_id'][$k]);
 				$output .= $link->generate() . ' ';
 			}
 
@@ -96,7 +96,7 @@
 		}
 
 
-		function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
+		function processRawFieldData($data, &$status, &$message=null, $simulate=false, $entry_id=NULL){
 			$status = self::__OK__;
 
 			if(empty($data)) return NULL;
@@ -231,7 +231,7 @@
 			$sort = 'ORDER BY ' . (in_array(strtolower($order), array('random', 'rand')) ? 'RAND()' : "`ed`.`relation_id` $order");
 		}
 
-		function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation=false){
+		function buildDSRetrievalSQL($data, &$joins, &$where, $andOperation=false){
 
 			$field_id = $this->get('id');
 
@@ -270,7 +270,7 @@
 				PRIMARY KEY  (`id`),
 				KEY `entry_id` (`entry_id`),
 				KEY `relation_id` (`relation_id`)
-				) TYPE=MyISAM;"
+				) TYPE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
 			);
 		}
 

@@ -2,7 +2,7 @@
 
 	require_once(TOOLKIT . '/class.administrationpage.php');
 
-	define_safe('BASE_URL', URL . '/symphony/extension/nestedcats');
+	define_safe('BASE_URL', SYMPHONY_URL . '/extension/nestedcats');
 	define_safe('EXTENSION', URL . '/extensions/nestedcats');
 
 	Class contentExtensionNestedcatsList extends AdministrationPage{
@@ -14,9 +14,9 @@
 
 		private $aTableHead;
 
-		function __construct(&$parent){
-			parent::__construct($parent);
-			$this->_driver = $this->_Parent->ExtensionManager->create('nestedcats');
+		function __construct(){
+			parent::__construct();
+			$this->_driver = Symphony::ExtensionManager()->create('nestedcats');
 		}
 
 		function view(){
@@ -122,7 +122,7 @@
 
 			$options = array(
 				array(NULL, false, __('With Selected...')),
-				array('delete', false, __('Delete'))
+				array('delete', false, __('EntryPreDelete'))
 			);
 
 			$wrapDiv = new XMLElement('div');
@@ -166,9 +166,9 @@
 
 			$fieldset->appendChild($label);
 
-			$fieldset->appendChild(Widget::Input('fields[level]', $parent['level'] ? $parent['level'] : 0, 'hidden'));
-			$fieldset->appendChild(Widget::Input('fields[rgt]', $parent['rgt'] ? $parent['rgt'] : 0, 'hidden'));
-			$fieldset->appendChild(Widget::Input('fields[parent]', $parent['id'] ? $parent['id'] : 0, 'hidden'));
+			$fieldset->appendChild(Widget::Input('fields[level]', $parent['level'] ? $parent['level'] : (string)0, 'hidden'));
+			$fieldset->appendChild(Widget::Input('fields[rgt]', $parent['rgt'] ? $parent['rgt'] : (string)0, 'hidden'));
+			$fieldset->appendChild(Widget::Input('fields[parent]', $parent['id'] ? $parent['id'] : (string)0, 'hidden'));
 
 
 			$this->Form->appendChild($fieldset);
@@ -178,7 +178,7 @@
 			$fieldset->setAttribute('class', 'secondary');
 
 			$label = Widget::Label(__('Parent Category'));
-			$label->appendChild(Widget::Input(Null, $parent['title'] ? $parent['title'] : __('None'), 'text', array('disabled' => 'true')));
+			$label->appendChild(Widget::Input((string)Null, $parent['title'] ? $parent['title'] : (string)__('None'), 'text', array('disabled' => 'true')));
 
 			$fieldset->appendChild($label);
 			$this->Form->appendChild($fieldset);
@@ -243,7 +243,7 @@
 
 			$fieldset->appendChild($label);
 
-			$fieldset->appendChild(Widget::Input('fields[level]', $cat['level'] ? $cat['level'] : 0, 'hidden'));
+			$fieldset->appendChild(Widget::Input('fields[level]', (string)$cat['level'] ? $cat['level'] : 0, 'hidden'));
 			$fieldset->appendChild(Widget::Input('fields[rgt]', $cat['rgt'], 'hidden'));
 			$fieldset->appendChild(Widget::Input('fields[lft]', $cat['lft'], 'hidden'));
 			$fieldset->appendChild(Widget::Input('fields[id]', $cat['id'], 'hidden'));
@@ -270,7 +270,7 @@
 			$div->setAttribute('class', 'actions');
 			$div->appendChild(Widget::Input('action[update]', __('Save Changes'), 'submit', array('accesskey' => 's')));
 
-			$button = new XMLElement('button', __('Delete'));
+			$button = new XMLElement('button', __('EntryPreDelete'));
 			$button->setAttributeArray(array('name' => 'action[delete]', 'class' => 'confirm delete', 'title' => __('Delete this Category')));
 			$div->appendChild($button);
 
