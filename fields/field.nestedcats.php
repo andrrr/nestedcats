@@ -11,7 +11,7 @@
 			$this->_name = __('Nested Categories');
 			$this->_required = true;
 
-			$this->_driver = $this->_engine->ExtensionManager->create('nestedcats');
+			$this->_driver = Symphony::ExtensionManager()->create('nestedcats');
 
 			// Set default
 			$this->set('show_column', 'no');
@@ -212,9 +212,9 @@
 			$fields['related_field_id'] = implode(',', $this->get('related_field_id'));
 			$fields['allow_multiple_selection'] = ($this->get('allow_multiple_selection') ? $this->get('allow_multiple_selection') : 'no');
 
-			$this->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id'");
+			Symphony::Database()->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id'");
 
-			if(!$this->Database->insert($fields, 'tbl_fields_' . $this->handle())) return false;
+			if(!Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle())) return false;
 
 			$this->removeSectionAssociation($id);
 
@@ -259,7 +259,7 @@
 
 		function createTable(){
 
-			return $this->_engine->Database->query(
+			return Symphony::Database()->query(
 
 				"CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
 				`id` int(11) unsigned NOT NULL auto_increment,
