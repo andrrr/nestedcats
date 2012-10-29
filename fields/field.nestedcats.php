@@ -6,12 +6,12 @@
 
 		protected $_driver = null;
 
-		function __construct(&$parent){
-			parent::__construct($parent);
+		function __construct(){
+			parent::__construct();
 			$this->_name = __('Nested Categories');
 			$this->_required = true;
 
-			$this->_driver = $this->_engine->ExtensionManager->create('nestedcats');
+			$this->_driver = Symphony::ExtensionManager()->create('nestedcats');
 
 			// Set default
 			$this->set('show_column', 'no');
@@ -87,7 +87,7 @@
 			$output = NULL;
 
 			foreach($data['relation_id'] as $k => $v){
-				$link = Widget::Anchor($data['value'][$k], URL . '/symphony/extension/nestedcats/list/view/' . $data['relation_id'][$k]);
+				$link = Widget::Anchor($data['value'][$k], SYMPHONY_URL . '/extension/nestedcats/list/view/' . $data['relation_id'][$k]);
 				$output .= $link->generate() . ' ';
 			}
 
@@ -96,7 +96,7 @@
 		}
 
 
-		function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
+		function processRawFieldData($data, &$status, &$message=null, $simulate=false, $entry_id=NULL){
 			$status = self::__OK__;
 
 			if(empty($data)) return NULL;
@@ -212,9 +212,9 @@
 			$fields['related_field_id'] = implode(',', $this->get('related_field_id'));
 			$fields['allow_multiple_selection'] = ($this->get('allow_multiple_selection') ? $this->get('allow_multiple_selection') : 'no');
 
-			$this->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id'");
+			Symphony::Database()->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id'");
 
-			if(!$this->Database->insert($fields, 'tbl_fields_' . $this->handle())) return false;
+			if(!Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle())) return false;
 
 			$this->removeSectionAssociation($id);
 
@@ -231,7 +231,7 @@
 			$sort = 'ORDER BY ' . (in_array(strtolower($order), array('random', 'rand')) ? 'RAND()' : "`ed`.`relation_id` $order");
 		}
 
-		function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation=false){
+		function buildDSRetrievalSQL($data, &$joins, &$where, $andOperation=false){
 
 			$field_id = $this->get('id');
 
@@ -259,7 +259,7 @@
 
 		function createTable(){
 
-			return $this->_engine->Database->query(
+			return Symphony::Database()->query(
 
 				"CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
 				`id` int(11) unsigned NOT NULL auto_increment,
@@ -270,7 +270,7 @@
 				PRIMARY KEY  (`id`),
 				KEY `entry_id` (`entry_id`),
 				KEY `relation_id` (`relation_id`)
-				) TYPE=MyISAM;"
+				) TYPE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
 			);
 		}
 

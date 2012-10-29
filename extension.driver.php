@@ -2,15 +2,6 @@
 
 	Class extension_nestedcats extends Extension{
 
-		public function about(){
-			return array('name' => __('Nested Categories β2'),
-						 'version' => '2.0.1',
-						 'release-date' => '2010-03-04',
-						 'author' => array('name' => 'Andrey Lubinov',
-								   'email' => 'andrey.lubinov@gmail.com')
-				 		);
-		}
-
 		public $extension_handle = 'nestedcats';
 
 		public function install(){
@@ -25,7 +16,7 @@
 						`handle` varchar(255),
 						PRIMARY KEY  (`id`),
 						KEY `lft` (`lft`,`rgt`,`level`)
-					) ENGINE=MyISAM  DEFAULT CHARSET=utf8
+					) ENGINE=MyISAM  CHARSET=utf8 COLLATE=utf8_unicode_ci
 			");
 
 			Symphony::Database()->query("CREATE TABLE IF NOT EXISTS `tbl_fields_{$this->extension_handle}` (
@@ -103,6 +94,7 @@
 						array(
 								'location' => 10,
 								'name' => __('Categories'),
+								'type' => 'content',
 								'children' => array(
 										array(
 												'name' => __('List View'),
@@ -423,7 +415,7 @@
 		function buildSelectAtPublishPannel($root, $selected, $fieldnamePrefix=NULL, $elementName, $fieldnamePostfix=NULL, $multiple){
 
 			if(!$data = $this->fetch($root, $includeCurrent=false)) return new XMLElement('p', __('It looks like youre trying to create an entry. Perhaps you want categories first? <br/><a
-href="%s">Click here to create some.</a>', array(URL . '/symphony/extension/nestedcats/list/')));
+href="%s">Click here to create some.</a>', array(SYMPHONY_URL . '/extension/nestedcats/list/')));
 
 			$options = array(array(NULL, NULL, __('Choose')));
 
@@ -455,7 +447,7 @@ href="%s">Click here to create some.</a>', array(URL . '/symphony/extension/nest
 		function buildSelectAtSettingsPannel($current, $fieldnamePrefix=NULL, $elementName, $fieldnamePostfix=NULL){
 
 			if(!$data = $this->fetch()) return new XMLElement('p', __('It looks like youre trying to create a field. Perhaps you want categories first? <br/><a href="%s">Click here to create some.</a>',
-array(URL . '/symphony/extension/nestedcats/list/')));
+array(SYMPHONY_URL . '/extension/nestedcats/list/')));
 
 			$options = array(array(0, NULL, __('Full tree')));
 
@@ -483,7 +475,7 @@ array(URL . '/symphony/extension/nestedcats/list/')));
 
 				$title = $cat['rgt'] == ($cat['lft'] + 1) ? $cat['title'] : $cat['title'] . ' &#8594;';
 
-				$item = Widget::TableData(Widget::Anchor($title, URL . '/symphony/extension/nestedcats/list/view/' . $cat['id'] . '/', __('View Category: ') . $cat['title'], $class));
+				$item = Widget::TableData(Widget::Anchor($title, SYMPHONY_URL . '/extension/nestedcats/list/view/' . $cat['id'] . '/', __('View Category: ') . $cat['title'], $class));
 				$item->appendChild(Widget::Input('items['.$cat['id'].']', NULL, 'checkbox'));
 				$item->appendChild(Widget::Input('lft['.$cat['id'].']', $cat['lft'], 'text'));
 				$item->appendChild(Widget::Input('rgt['.$cat['id'].']', $cat['rgt'], 'text'));
@@ -502,7 +494,7 @@ array(URL . '/symphony/extension/nestedcats/list/')));
 
         $title = $cat['level'] == 0 ? $cat['title'] : '&#8594; ' . $cat['title'];
 
-        $item = Widget::TableData(Widget::Anchor($title, URL . '/symphony/extension/nestedcats/tree/view/' . $cat['id'] . '/', __('View Category: ') . $cat['title'], 'n'.$cat['level']));
+        $item = Widget::TableData(Widget::Anchor($title, SYMPHONY_URL . '/extension/nestedcats/tree/view/' . $cat['id'] . '/', __('View Category: ') . $cat['title'], 'n'.$cat['level']));
         $item->appendChild(Widget::Input('items['.$cat['id'].']', NULL, 'checkbox'));
         $item->appendChild(Widget::Input('lft['.$cat['id'].']', $cat['lft'], 'text'));
         $item->appendChild(Widget::Input('rgt['.$cat['id'].']', $cat['rgt'], 'text'));
@@ -526,7 +518,7 @@ array(URL . '/symphony/extension/nestedcats/list/')));
 				$options = array(array(NULL,NULL, __('None')));
 			} elseif ($settingsPannel && count($tree) == 1) {
 
-				return new XMLElement('p', __('It looks like youre trying to create a field. Perhaps you want categories first? <br/><a href="%s">Click here to create some.</a>', array(URL . '/symphony/extension/nestedcats/overview/new/')));
+				return new XMLElement('p', __('It looks like youre trying to create a field. Perhaps you want categories first? <br/><a href="%s">Click here to create some.</a>', array(SYMPHONY_URL . '/extension/nestedcats/overview/new/')));
 
 			} else {
 				$options = array(array($tree[0]['id'], NULL, __('Full Tree')));

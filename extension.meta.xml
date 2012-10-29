@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<extension id="nestedcats" status="experimental" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>Nested Categories</name>
+	<description>Categorizes your entries multiple levels deep.</description>
+	<repo type="github">https://github.com/andrrr/nestedcats</repo>
+	<url type="discuss">http://getsymphony.com/discuss/thread/40361/</url>
+	<url type="issues">https://github.com/andrrr/nestedcats/issues</url>
+	<authors>
+		<author>
+			<name github="andrrr" symphony="andrrr">Andrey Lubinov</name>
+		</author>
+	</authors>
+	<releases>
+		<release version="2.0.2 beta" date="2012-09-11" min="2.3">
+			`2.3` Compatability!
+		</release>
+		<release version="2.0.1 beta" date="2010-06-06" min="2.0" max="2.2.x"/>
+		<release version="2.0 beta" date="2010-03-04" max="2.0"/>
+	</releases>
+</extension>
