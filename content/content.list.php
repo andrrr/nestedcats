@@ -243,7 +243,7 @@
 
 			$fieldset->appendChild($label);
 
-			$fieldset->appendChild(Widget::Input('fields[level]', (string)$cat['level'] ? $cat['level'] : 0, 'hidden'));
+			$fieldset->appendChild(Widget::Input('fields[level]', $cat['level'] ? $cat['level'] : (string)0, 'hidden'));
 			$fieldset->appendChild(Widget::Input('fields[rgt]', $cat['rgt'], 'hidden'));
 			$fieldset->appendChild(Widget::Input('fields[lft]', $cat['lft'], 'hidden'));
 			$fieldset->appendChild(Widget::Input('fields[id]', $cat['id'], 'hidden'));
@@ -258,7 +258,7 @@
 			$parent = $this->_driver->get($cat['parent']);
 
 			$label = Widget::Label(__('Parent Category'));
-			$label->appendChild(Widget::Input(Null, $cat['parent'] == 0 ? __('None') : $parent['title'], 'text', array('disabled' => 'true')));
+			$label->appendChild(Widget::Input((string)Null, $cat['parent'] == (string)0 ? __('None') : $parent['title'], 'text', array('disabled' => 'true')));
 
 			$fieldset->appendChild($label);
 			$this->Form->appendChild($fieldset);
@@ -270,7 +270,7 @@
 			$div->setAttribute('class', 'actions');
 			$div->appendChild(Widget::Input('action[update]', __('Save Changes'), 'submit', array('accesskey' => 's')));
 
-			$button = new XMLElement('button', __('EntryPreDelete'));
+			$button = new XMLElement('button', __('Delete'));
 			$button->setAttributeArray(array('name' => 'action[delete]', 'class' => 'confirm delete', 'title' => __('Delete this Category')));
 			$div->appendChild($button);
 

@@ -244,7 +244,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 
 		$fieldset->appendChild($label);
 
-		$fieldset->appendChild(Widget::Input('fields[level]', $cat['level'] ? $cat['level'] : 0, 'hidden'));
+		$fieldset->appendChild(Widget::Input('fields[level]', $cat['level'] ? $cat['level'] : (string)0, 'hidden'));
 		$fieldset->appendChild(Widget::Input('fields[id]', $cat['id'], 'hidden'));
 		$fieldset->appendChild(Widget::Input('fields[rgt]', $cat['rgt'], 'hidden'));
 		$fieldset->appendChild(Widget::Input('fields[lft]', $cat['lft'], 'hidden'));
@@ -268,7 +268,7 @@ Class contentExtensionNestedcatsTree extends AdministrationPage{
 		$div->setAttribute('class', 'actions');
 		$div->appendChild(Widget::Input('action[edit]', __('Save Changes'), 'submit', array('accesskey' => 's')));
 
-		$button = new XMLElement('button', __('EntryPreDelete'));
+		$button = new XMLElement('button', __('Delete'));
 		$button->setAttributeArray(array('name' => 'action[delete]', 'class' => 'confirm delete', 'title' => __('Delete this Category')));
 		$div->appendChild($button);
 
